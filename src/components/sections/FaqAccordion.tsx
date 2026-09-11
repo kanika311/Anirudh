@@ -1,118 +1,127 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  ChevronDown,
-  HelpCircle,
-  Sparkles,
-} from 'lucide-react';
 import { FAQ } from '@/types';
-import { FAQJsonLd } from '@/components/seo/JsonLd';
 
 interface FaqAccordionProps {
-  faqs: FAQ[];
+  faqs?: FAQ[];
 }
+
+const defaultFaqs = [
+  {
+    q: 'What is SEO cost in Lucknow?',
+    a: 'My standard SEO pricing is strictly transparent and customized exclusively based on your competitive vertical. An exact proposal is provided directly after our extensive free SEO audit.',
+  },
+  {
+    q: 'How long SEO takes?',
+    a: 'Aggressive Local Google dominance prominently shows high growth within 3-6 months. We solely employ sustainable White-Hat SEO techniques ensuring unshakeable, long-lasting ROI.',
+  },
+  {
+    q: 'Do you work in Kanpur?',
+    a: 'Yes. While I am prominently located in Lucknow, my Digital Marketing capabilities routinely rank local Kanpur businesses #1 on Google Maps.',
+  },
+  {
+    q: 'Can you rank my business?',
+    a: 'Absolutely. Our localized technical auditing, vast backlink networks, and proprietary keyword research routinely propel businesses entirely beyond their competitors organically.',
+  },
+  {
+    q: 'Free SEO audit mein kya milta hai?',
+    a: 'Free SEO audit mein aapko milega: Current website health score, Top 10 technical issues, Keyword opportunity analysis, Competitor analysis (top 3), Local SEO assessment, aur Custom action plan. Completely free — koi strings attached nahi.',
+  },
+  {
+    q: 'Reporting kitni often milti hai?',
+    a: 'Professional aur Enterprise packages mein weekly detailed PDF reports milti hain — traffic, rankings, leads, ad spend, ROI — sab clearly mentioned. Starter package mein monthly report milti hai. Anytime WhatsApp par update maang sakte hain.',
+  },
+  {
+    q: 'Kya aap website bhi banate hain?',
+    a: 'Haan! Main Custom HTML/CSS, WordPress, Landing Pages aur E-commerce websites banata hoon. Mere websites ka Google PageSpeed score 95+ hota hai — blazing fast, mobile-first, aur fully SEO-optimized.',
+  },
+  {
+    q: 'Agency hire karein ya aapko? Fark kya hai?',
+    a: 'Jab aap mujhe hire karte hain, toh seedha ek senior expert ke saath kaam karte hain — koi intern, koi account manager chain nahi. Main personally aapke campaigns manage karta hoon. Agencies se cheaper bhi hoon aur faster results bhi deliver karta hoon. Plus — transparent pricing aur no lock-in.',
+  },
+];
 
 export function FaqAccordion({ faqs }: FaqAccordionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  const categories = ['All', ...Array.from(new Set(faqs.map((f) => f.category)))];
+  const displayList =
+    faqs && faqs.length >= 4
+      ? faqs.map((f) => ({ q: f.question, a: f.answer }))
+      : defaultFaqs;
 
-  const filteredFaqs =
-    selectedCategory === 'All'
-      ? faqs
-      : faqs.filter((f) => f.category === selectedCategory);
-
-  const toggleAccordion = (idx: number) => {
-    setOpenIndex(openIndex === idx ? null : idx);
+  const toggleFaq = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
   };
 
   return (
-    <section id="faq" className="py-20 md:py-28 bg-slate-50/50 dark:bg-dark-surface/40 relative">
-      {/* Embedded FAQPage Schema */}
-      <FAQJsonLd faqs={faqs} />
+    <section id="faq">
+      <div className="container">
+        <div className="faq-grid">
+          <div>
+            <span className="tag">Frequently Asked Questions</span>
+            <div className="divider"></div>
+            <h2 className="section-heading">
+              Aapke <span className="gradient-text">Sawaal,<br />Mere Jawab</span>
+            </h2>
+            <p className="section-sub" style={{ marginBottom: '32px' }}>
+              Koi bhi doubt ho toh seedha WhatsApp karein — main personally jawab deta hoon.
+            </p>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-primary-50 dark:bg-primary-950/60 border border-primary-200 dark:border-primary-800/60 text-primary-600 dark:text-primary-400">
-            <HelpCircle className="w-3.5 h-3.5" />
-            Frequently Asked Questions
-          </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Everything You Need to Know About <span className="text-gradient">Our Retainers</span>
-          </h2>
-          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300">
-            Clear answers on scopes, reporting cadences, tech stacks, and contract terms.
-          </p>
-
-          {/* Category Filter Pills */}
-          {categories.length > 2 && (
-            <div className="pt-4 flex flex-wrap items-center justify-center gap-2">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => {
-                    setSelectedCategory(cat);
-                    setOpenIndex(0);
-                  }}
-                  className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                    selectedCategory === cat
-                      ? 'bg-primary-600 text-white shadow-md'
-                      : 'bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border text-slate-600 dark:text-slate-300 hover:bg-slate-100'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Accordion List */}
-        <div className="space-y-4">
-          {filteredFaqs.map((faq, idx) => {
-            const isOpen = openIndex === idx;
-
-            return (
-              <div
-                key={faq._id || idx}
-                className="rounded-2xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border overflow-hidden shadow-sm transition-all"
-              >
-                <button
-                  onClick={() => toggleAccordion(idx)}
-                  className="w-full p-6 text-left flex items-center justify-between gap-4 font-bold text-base sm:text-lg text-slate-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                  aria-expanded={isOpen}
-                >
-                  <span>{faq.question}</span>
+            <div className="faq-list">
+              {displayList.map((faq, idx) => {
+                const isOpen = openIndex === idx;
+                return (
                   <div
-                    className={`p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-transform duration-200 flex-shrink-0 ${
-                      isOpen ? 'rotate-180 bg-primary-50 text-primary-600 dark:bg-primary-950/60 dark:text-primary-400' : ''
-                    }`}
+                    key={idx}
+                    className={`faq-item ${isOpen ? 'open' : ''}`}
+                    onClick={() => toggleFaq(idx)}
+                    style={{ cursor: 'pointer' }}
                   >
-                    <ChevronDown className="w-4 h-4" />
+                    <div className="faq-q">
+                      {faq.q} <div className="faq-icon">{isOpen ? '−' : '+'}</div>
+                    </div>
+                    {isOpen && <div className="faq-a" style={{ display: 'block' }}>{faq.a}</div>}
                   </div>
-                </button>
+                );
+              })}
+            </div>
+          </div>
 
-                <AnimatePresence>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25 }}
-                    >
-                      <div className="px-6 pb-6 pt-1 text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-800/60 mt-1">
-                        {faq.answer}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
+          <div className="faq-sidebar">
+            <div className="faq-sidebar-card">
+              <h3>🚀 Need a Free SEO Audit?</h3>
+              <p>
+                Schedule a complete technical health check instantly. I personally review your architecture and send over a robust, actionable blueprint.
+              </p>
+              <a href="#contact" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+                Request Free Audit
+              </a>
+            </div>
+
+            <div
+              className="faq-sidebar-card"
+              style={{
+                marginTop: '20px',
+                background: 'rgba(37,211,102,0.05)',
+                borderColor: 'rgba(37,211,102,0.2)',
+              }}
+            >
+              <h3>💬 WhatsApp Par Baat Karein</h3>
+              <p>
+                Seedha WhatsApp karein — main 10 mins mein reply karta hoon. Aapke sawaal ka jawab abhi milega.
+              </p>
+              <a
+                href="https://wa.me/919999999999?text=Hi%20Anirudh!%20I%20need%20digital%20marketing%20help%20for%20my%20business."
+                className="btn btn-whatsapp"
+                style={{ width: '100%', justifyContent: 'center' }}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                📱 WhatsApp Now
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>

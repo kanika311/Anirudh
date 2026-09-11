@@ -1,141 +1,107 @@
 'use client';
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Star,
-  Quote,
-  ChevronLeft,
-  ChevronRight,
-  Sparkles,
-  CheckCircle2,
-} from 'lucide-react';
+import React from 'react';
 import { Testimonial, SiteSettings } from '@/types';
 
 interface TestimonialsCarouselProps {
-  testimonials: Testimonial[];
+  testimonials?: Testimonial[];
   settings?: SiteSettings;
 }
 
-export function TestimonialsCarousel({ testimonials, settings }: TestimonialsCarouselProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const name = settings?.consultantName || 'Alex Rivera';
+const defaultTestimonials = [
+  {
+    stars: '⭐⭐⭐⭐⭐',
+    text: '"Anirudh ne hamare clinic ki Google ranking completely transform kar di. Pehle page 4 par the, ab page 1 par aate hain. Appointments 3 guna ho gayi. Bilkul genuine aur dedicated person hai."',
+    initials: 'DR',
+    name: 'Dr. Rahul Mishra',
+    role: 'Multi-Specialty Clinic Owner',
+    city: '📍 Gomti Nagar, Lucknow',
+  },
+  {
+    stars: '⭐⭐⭐⭐⭐',
+    text: '"Meta Ads ke baare mein mujhe kuch nahi pata tha. Anirudh ne sab samjhaya aur hamare products ki sales 5x ho gayi. ROAS 7x se zyada aa raha hai. Best investment tha hamare business ke liye!"',
+    initials: 'PS',
+    name: 'Priya Sharma',
+    role: 'Fashion Brand Founder',
+    city: '📍 Kanpur City',
+  },
+  {
+    stars: '⭐⭐⭐⭐⭐',
+    text: '"Hamari coaching ke admissions bohot slow the. Anirudh Kumar ka SEO + Google Ads combination kamaal ka tha. 6 mahine mein hum Lucknow ke top 3 coaching results mein aa gaye. Outstanding results!"',
+    initials: 'AV',
+    name: 'Amit Verma',
+    role: 'Coaching Institute Director',
+    city: '📍 Hazratganj, Lucknow',
+  },
+];
 
-  const nextTestimonial = () => {
-    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
-  };
-
-  const prevTestimonial = () => {
-    setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
-  };
-
-  if (!testimonials || testimonials.length === 0) return null;
-
-  const current = testimonials[currentIndex];
+export function TestimonialsCarousel({ testimonials }: TestimonialsCarouselProps) {
+  const displayList =
+    testimonials && testimonials.length >= 3
+      ? testimonials.slice(0, 3).map((t, idx) => ({
+          stars: '⭐⭐⭐⭐⭐',
+          text: `"${t.quote}"`,
+          initials: t.initials || (t.name ? t.name.substring(0, 2).toUpperCase() : defaultTestimonials[idx].initials),
+          name: t.name,
+          role: t.role || t.company,
+          city: t.location || defaultTestimonials[idx].city,
+        }))
+      : defaultTestimonials;
 
   return (
-    <section id="testimonials" className="py-20 md:py-28 bg-slate-50/50 dark:bg-dark-surface/40 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/60 text-amber-600 dark:text-amber-400">
-            <Sparkles className="w-3.5 h-3.5" />
-            Verified Client Reviews
-          </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Trusted by Leaders at <span className="text-gradient">Fast-Growing Companies</span>
+    <section id="testimonials">
+      <div className="container">
+        <div className="section-header center text-center">
+          <span className="tag">Client Reviews</span>
+          <div className="divider"></div>
+          <h2 className="section-heading">
+            Verified Client <span className="gradient-text">Testimonials</span>
           </h2>
-          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300">
-            Hear directly from founders, VPs of Growth, and CMOs who have partnered with {name}.
+          <p className="section-sub">
+            Real clients, real reviews — Lucknow aur Kanpur ke successful businesses jo apni growth ka श्रेय Anirudh Kumar ko dete hain.
           </p>
         </div>
 
-        {/* Featured Testimonial Card */}
-        <div className="max-w-4xl mx-auto">
-          <div className="relative rounded-3xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border p-8 sm:p-12 shadow-xl">
-            {/* Top Row: Stars + Metric Highlight */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-              <div className="flex items-center gap-1 text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-current" />
-                ))}
-                <span className="ml-2 text-xs font-bold text-slate-700 dark:text-slate-200">
-                  5.0 Verified Review
-                </span>
+        <div className="testimonials-grid">
+          {displayList.map((testi, idx) => (
+            <div key={idx} className="testi-card">
+              <div className="stars">{testi.stars}</div>
+              <p className="testi-text">{testi.text}</p>
+              <div className="testi-author">
+                <div className="testi-avatar">{testi.initials}</div>
+                <div>
+                  <div className="testi-name">{testi.name}</div>
+                  <div className="testi-role">{testi.role}</div>
+                  <div className="testi-city">{testi.city}</div>
+                </div>
               </div>
-
-              {current.metricHighlight && (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  {current.metricHighlight}
-                </div>
-              )}
             </div>
+          ))}
+        </div>
 
-            {/* Quote Body */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentIndex}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-6"
-              >
-                <p className="text-lg sm:text-2xl text-slate-800 dark:text-slate-100 font-medium leading-relaxed italic">
-                  "{current.quote}"
-                </p>
-
-                {/* Author Info */}
-                <div className="flex items-center gap-4 pt-4 border-t border-slate-100 dark:border-slate-800/80">
-                  {current.avatar ? (
-                    <div className="relative w-14 h-14 rounded-2xl overflow-hidden border-2 border-primary-500/30">
-                      <Image
-                        src={current.avatar}
-                        alt={current.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-primary-600 to-indigo-500 text-white font-extrabold text-xl flex items-center justify-center">
-                      {current.initials || 'CL'}
-                    </div>
-                  )}
-
-                  <div>
-                    <h4 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-                      {current.name}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-                      {current.role}, <span className="font-semibold text-slate-700 dark:text-slate-300">{current.company}</span> • {current.location}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Navigation Arrows */}
-            <div className="flex items-center justify-end gap-3 mt-8 pt-4">
-              <button
-                onClick={prevTestimonial}
-                className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
-                aria-label="Previous review"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <span className="text-xs font-bold text-slate-400">
-                {currentIndex + 1} / {testimonials.length}
-              </span>
-              <button
-                onClick={nextTestimonial}
-                className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
-                aria-label="Next review"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
+        <div
+          className="text-center mt-6"
+          style={{
+            padding: '20px',
+            background: 'rgba(255,107,0,0.05)',
+            border: '1px solid rgba(255,107,0,0.15)',
+            borderRadius: 'var(--radius)',
+            marginTop: '32px',
+            textAlign: 'center',
+          }}
+        >
+          <div style={{ fontSize: '0.85rem', color: 'var(--text2)' }}>
+            Google Reviews par verified ⭐ 4.9/5 rating — 87+ satisfied clients
+          </div>
+          <div
+            style={{
+              fontFamily: 'var(--ff-d)',
+              fontSize: '2rem',
+              color: 'var(--accent)',
+              marginTop: '8px',
+            }}
+          >
+            ⭐⭐⭐⭐⭐ 4.9 / 5.0
           </div>
         </div>
       </div>

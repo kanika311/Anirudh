@@ -1,129 +1,137 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Check, X, Sparkles, ShieldCheck } from 'lucide-react';
-
 import { SiteSettings } from '@/types';
 
 interface ComparisonTableProps {
   settings?: SiteSettings;
-  consultantName?: string;
 }
 
-export function ComparisonTable({ settings, consultantName }: ComparisonTableProps) {
-  const name = consultantName || settings?.consultantName || 'Alex Rivera';
-  const yearsExp = settings?.heroCounters?.yearsExperience || 10;
-
-  const comparisonRows = [
-    {
-      feature: 'Direct Senior Attention',
-      alex: `100% executed personally by ${name} (${yearsExp}+ yrs exp)`,
-      agency: 'Pitched by seniors, handed off to junior coordinators',
-    },
-    {
-      feature: 'Execution Velocity',
-      alex: 'Rapid same-week sprints & continuous deployment',
-      agency: '3 to 6-week turnaround with bureaucratic review tiers',
-    },
-    {
-      feature: 'Bespoke Strategy vs Templates',
-      alex: 'Custom data architecture tailored to your unique unit economics',
-      agency: 'Generic one-size-fits-all PDF checklists and copy-paste audits',
-    },
-    {
-      feature: 'Contract Terms & Lock-In',
-      alex: 'Flexible month-to-month retainers (Earn business every 30 days)',
-      agency: '6 to 12-month punitive lock-in contracts with auto-renewal',
-    },
-    {
-      feature: 'Direct Communication Access',
-      alex: 'Private Slack channel & direct WhatsApp hotline for founders',
-      agency: 'Formal ticketing systems & slow weekly account manager emails',
-    },
-    {
-      feature: 'Technical & Engineering Depth',
-      alex: 'Next.js, TypeScript, React schema, server-side CAPI code execution',
-      agency: 'Surface-level recommendations without code-level execution',
-    },
-    {
-      feature: 'Client Roster & Focus',
-      alex: 'Strictly capped at 6 active enterprise partners at any time',
-      agency: 'Account managers juggling 15 to 25 accounts simultaneously',
-    },
-    {
-      feature: 'Success Metric Focus',
-      alex: 'Commercial revenue, pipeline ARR, and blended CAC reduction',
-      agency: 'Vanity impressions, raw traffic volume, and ranking reports',
-    },
-  ];
+export function ComparisonTable({ settings }: ComparisonTableProps) {
+  const consultantName =
+    settings?.consultantName && settings.consultantName !== 'Alex Rivera'
+      ? settings.consultantName
+      : 'Anirudh Kumar';
 
   return (
-    <section className="py-20 md:py-28 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/60 text-amber-600 dark:text-amber-400">
-            <Sparkles className="w-3.5 h-3.5" />
-            Head-to-Head Comparison
-          </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            {name} vs. <span className="text-gradient">The Typical Agency</span>
-          </h2>
-          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300">
-            See why ambitious founders and venture-backed scale-ups choose a dedicated senior partner over bloated agency overhead.
-          </p>
-        </div>
+    <section id="why">
+      <div className="container">
+        <div className="why-grid">
+          <div>
+            <span className="tag">Why Choose Me</span>
+            <div className="divider"></div>
+            <h2 className="section-heading">
+              Better Than Agencies — <span className="gradient-text">Direct Expert Support</span>
+            </h2>
+            <p className="section-sub" style={{ marginBottom: 0 }}>
+              Hire the Best Digital Marketer in Lucknow and receive immediate expert support. I personally mandate your success.
+            </p>
 
-        {/* Comparison Table */}
-        <div className="rounded-3xl overflow-hidden border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-card shadow-xl">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[650px]">
-              <thead>
-                <tr className="border-b border-slate-200 dark:border-dark-border bg-slate-50/80 dark:bg-dark-surface/80">
-                  <th className="p-5 sm:p-6 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/3">
-                    Feature & Workflow
-                  </th>
-                  <th className="p-5 sm:p-6 text-base font-extrabold text-primary-600 dark:text-primary-400 bg-primary-50/50 dark:bg-primary-950/30 w-1/3 border-x border-primary-200/50 dark:border-primary-800/30">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck className="w-5 h-5" />
-                      <span>{name} (Solo Partner)</span>
-                    </div>
-                  </th>
-                  <th className="p-5 sm:p-6 text-base font-bold text-slate-700 dark:text-slate-300 w-1/3">
-                    Typical Big Agency
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs sm:text-sm">
-                {comparisonRows.map((row, idx) => (
-                  <tr
-                    key={idx}
-                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
-                  >
-                    <td className="p-5 sm:p-6 font-bold text-slate-900 dark:text-white">
-                      {row.feature}
-                    </td>
-                    <td className="p-5 sm:p-6 bg-primary-50/20 dark:bg-primary-950/10 border-x border-primary-100/50 dark:border-primary-900/20 font-medium text-slate-900 dark:text-slate-100">
-                      <div className="flex items-start gap-2.5">
-                        <div className="p-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5">
-                          <Check className="w-3.5 h-3.5 stroke-[3]" />
-                        </div>
-                        <span>{row.alex}</span>
-                      </div>
-                    </td>
-                    <td className="p-5 sm:p-6 text-slate-500 dark:text-slate-400">
-                      <div className="flex items-start gap-2.5">
-                        <div className="p-1 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex-shrink-0 mt-0.5">
-                          <X className="w-3.5 h-3.5 stroke-[3]" />
-                        </div>
-                        <span>{row.agency}</span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="why-points">
+              <div className="why-point">
+                <div className="why-point-icon">🤝</div>
+                <div>
+                  <div className="why-point-title">Direct Expert Support</div>
+                  <div className="why-point-desc">
+                    No agency delays. No assigned interns. You receive active consultation directly from a leading Digital Marketing Expert Kanpur &amp; Lucknow.
+                  </div>
+                </div>
+              </div>
+
+              <div className="why-point">
+                <div className="why-point-icon">📊</div>
+                <div>
+                  <div className="why-point-title">No Agency Middleman</div>
+                  <div className="why-point-desc">
+                    Avoid high markups. I deliver fast execution, instant transparency, and dedicated strategy uniquely aligned to your vertical.
+                  </div>
+                </div>
+              </div>
+
+              <div className="why-point">
+                <div className="why-point-icon">💰</div>
+                <div>
+                  <div className="why-point-title">Transparent Pricing</div>
+                  <div className="why-point-desc">
+                    Crystal clear quotes on our top SEO services. Complete visibility into what you pay for standard SEO, Google Ads, and Meta marketing.
+                  </div>
+                </div>
+              </div>
+
+              <div className="why-point">
+                <div className="why-point-icon">📍</div>
+                <div>
+                  <div className="why-point-title">Local Market Understanding</div>
+                  <div className="why-point-desc">
+                    Extensive knowledge targeting both Lucknow and Kanpur. Dominate nearby local searches specifically optimized for your physical audience.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="vs-table">
+              <div className="vs-header">
+                <div>Feature</div>
+                <div className="col-me">✅ {consultantName}</div>
+                <div>❌ Typical Agency</div>
+              </div>
+              <div className="vs-row">
+                <span className="label">Personal Expert Attention</span>
+                <span className="vs-yes">✅ Always</span>
+                <span className="vs-no">❌ Intern assigned</span>
+              </div>
+              <div className="vs-row">
+                <span className="label">Transparent Pricing</span>
+                <span className="vs-yes">✅ Clear packages</span>
+                <span className="vs-no">❌ Hidden charges</span>
+              </div>
+              <div className="vs-row">
+                <span className="label">Direct Communication</span>
+                <span className="vs-yes">✅ WhatsApp 24/7</span>
+                <span className="vs-no">❌ Emails only</span>
+              </div>
+              <div className="vs-row">
+                <span className="label">Weekly Reports</span>
+                <span className="vs-yes">✅ Detailed PDF</span>
+                <span className="vs-no">❌ Monthly (maybe)</span>
+              </div>
+              <div className="vs-row">
+                <span className="label">Local SEO Expertise</span>
+                <span className="vs-yes">✅ Lucknow/Kanpur</span>
+                <span className="vs-no">❌ Generic strategies</span>
+              </div>
+              <div className="vs-row">
+                <span className="label">Free SEO Audit</span>
+                <span className="vs-yes">✅ Hamesha free</span>
+                <span className="vs-no">❌ ₹2,000 - ₹5,000</span>
+              </div>
+              <div className="vs-row">
+                <span className="label">No Lock-in Contract</span>
+                <span className="vs-yes">✅ Month-to-month</span>
+                <span className="vs-no">❌ 6-12 month lock</span>
+              </div>
+              <div className="vs-row">
+                <span className="label">Website Speed (PageSpeed)</span>
+                <span className="vs-yes">✅ 95+ Score</span>
+                <span className="vs-no">❌ 40-60 score</span>
+              </div>
+            </div>
+
+            <div
+              style={{
+                marginTop: '16px',
+                padding: '16px 20px',
+                background: 'rgba(255,107,0,0.08)',
+                border: '1px solid rgba(255,107,0,0.2)',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: '0.85rem',
+                color: 'var(--text2)',
+              }}
+            >
+              💡 <strong style={{ color: 'var(--text)' }}>Pro Tip:</strong> Typical agencies se zyada expensive hain aur results deliver karne mein slow. Ek dedicated expert se seedha kaam karein — better results, faster turnaround.
+            </div>
           </div>
         </div>
       </div>

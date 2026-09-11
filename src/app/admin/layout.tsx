@@ -86,7 +86,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex">
       {/* Sidebar for Desktop */}
-      <aside className="hidden lg:flex w-64 flex-col justify-between bg-slate-900 border-r border-slate-800 p-6">
+      <aside className="hidden lg:flex w-64 flex-shrink-0 min-h-screen flex-col justify-between bg-slate-900 border-r border-slate-800 p-6">
         <div className="space-y-6">
           {/* Brand */}
           <div className="flex items-center gap-3">

@@ -1,56 +1,70 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Plus_Jakarta_Sans, Bebas_Neue } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { PersonLocalBusinessJsonLd } from '@/components/seo/JsonLd';
 import { Toaster } from 'react-hot-toast';
+import { api } from '@/lib/api';
+import { DynamicFavicon } from '@/components/seo/DynamicFavicon';
 
-const inter = Inter({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-body',
+});
+
+const bebasNeue = Bebas_Neue({
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-heading',
 });
 
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#090D16' },
+    { media: '(prefers-color-scheme: dark)', color: '#06060F' },
   ],
   width: 'device-width',
   initialScale: 1,
 };
 
-import { api } from '@/lib/api';
-import { DynamicFavicon } from '@/components/seo/DynamicFavicon';
-
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await api.getSettings();
-  const consultantName = settings.consultantName || 'Alex Rivera';
-  const siteName = settings.siteName || `${consultantName} | Growth Consulting`;
-  
-  // Smart title: if globalSeo.metaTitle exists but has Alex Rivera while consultantName was updated, replace it
+  const consultantName =
+    settings.consultantName && settings.consultantName !== 'Alex Rivera'
+      ? settings.consultantName
+      : 'Anirudh Kumar';
+  const siteName =
+    settings.siteName && !settings.siteName.includes('Alex Rivera')
+      ? settings.siteName
+      : `${consultantName} | Best Digital Marketing Expert in Lucknow & Kanpur`;
+
   let metaTitle = settings.globalSeo?.metaTitle;
-  if (!metaTitle || (metaTitle.includes('Alex Rivera') && consultantName !== 'Alex Rivera')) {
-    metaTitle = metaTitle ? metaTitle.replace(/Alex Rivera/g, consultantName) : `${consultantName} | ${settings.tagline || 'Senior Technical SEO & Growth Marketing Consultant'}`;
+  if (!metaTitle || metaTitle.includes('Alex Rivera')) {
+    metaTitle = `Best Digital Marketing Expert in Lucknow & Kanpur | ${consultantName} – SEO Specialist`;
   }
 
   const metaDescription =
     settings.globalSeo?.metaDescription ||
-    `Scale organic search, paid performance ROAS, and conversion rate architecture with battle-tested growth blueprints by ${consultantName}. 10+ years experience, $48M+ tracked revenue.`;
-  const ogImageUrl = settings.globalSeo?.ogImageUrl || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop';
-  const iconUrl = settings.faviconUrl || settings.logoUrl || '/favicon.ico';
+    `${consultantName} – Lucknow & Kanpur ka #1 Digital Marketing Expert. SEO, Social Media Marketing, Meta Ads, Google Ads, Website Development. Free SEO Audit available. 200+ clients served.`;
+  const ogImageUrl = settings.globalSeo?.ogImageUrl || '/anirudh-hero.png';
+  const iconUrl = settings.faviconUrl || settings.logoUrl || '/anirudh-hero.png';
   const keywords = settings.globalSeo?.keywords?.length
     ? settings.globalSeo.keywords
     : [
-        'SEO consultant',
-        'growth marketing consultant',
-        'technical SEO audit',
-        'SaaS SEO strategy',
-        'Google Ads specialist',
-        'CRO consultant',
-        'Next.js web developer',
+        'seo expert in lucknow',
+        'digital marketing lucknow',
+        'anirudh kumar lucknow',
+        'best seo in lucknow',
+        'digital marketing kanpur',
+        'seo company lucknow',
+        'social media marketing lucknow',
+        'meta ads expert lucknow',
+        'google ads lucknow',
+        'website development lucknow',
       ];
 
   return {
@@ -66,17 +80,16 @@ export async function generateMetadata(): Promise<Metadata> {
         { url: iconUrl },
         { url: iconUrl, type: 'image/png' },
         { url: iconUrl, type: 'image/x-icon' },
-        { url: iconUrl, type: 'image/svg+xml' },
       ],
       shortcut: [iconUrl],
-      apple: [settings.logoUrl || iconUrl],
+      apple: [iconUrl],
     },
-    authors: [{ name: consultantName, url: 'https://alexriveragrowth.com' }],
+    authors: [{ name: consultantName, url: 'https://anirudhkumarseo.netlify.app' }],
     creator: consultantName,
     openGraph: {
       type: 'website',
-      locale: 'en_US',
-      url: 'https://alexriveragrowth.com',
+      locale: 'en_IN',
+      url: 'https://anirudhkumarseo.netlify.app',
       siteName: siteName,
       title: metaTitle,
       description: metaDescription,
@@ -93,21 +106,11 @@ export async function generateMetadata(): Promise<Metadata> {
       card: 'summary_large_image',
       title: metaTitle,
       description: metaDescription,
-      creator: settings.socialLinks?.twitter
-        ? `@${settings.socialLinks.twitter.split('/').filter(Boolean).pop()}`
-        : `@${consultantName.replace(/\s+/g, '').toLowerCase()}`,
       images: [ogImageUrl],
     },
     robots: {
       index: true,
       follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
     },
   };
 }
@@ -118,16 +121,25 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const settings = await api.getSettings();
-  const iconUrl = settings.faviconUrl || settings.logoUrl || '';
+  const iconUrl = settings.faviconUrl || settings.logoUrl || '/anirudh-hero.png';
 
   return (
-    <html lang="en" suppressHydrationWarning className={inter.variable}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${plusJakartaSans.variable} ${bebasNeue.variable}`}
+      data-theme="dark"
+    >
       <head>
-        <DynamicFavicon initialIcon={iconUrl} initialTitle={settings.consultantName} />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        />
+        <DynamicFavicon initialIcon={iconUrl} initialTitle={settings.consultantName || 'Anirudh Kumar'} />
         <PersonLocalBusinessJsonLd />
       </head>
-      <body className="min-h-screen bg-background text-foreground antialiased flex flex-col selection:bg-primary-500 selection:text-white">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+      <body className="min-h-screen antialiased flex flex-col selection:bg-orange-500 selection:text-white">
+        <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem={false}>
           <Navbar />
           <main className="flex-grow">{children}</main>
           <Footer />

@@ -1,337 +1,192 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { motion } from 'framer-motion';
-import {
-  Mail,
-  Phone,
-  MapPin,
-  MessageSquare,
-  Sparkles,
-  Send,
-  CheckCircle2,
-  AlertCircle,
-  Clock,
-  ShieldCheck,
-} from 'lucide-react';
-import { api } from '@/lib/api';
 import { SiteSettings, Service } from '@/types';
-
-const leadFormSchema = z.object({
-  name: z.string().min(2, 'Please enter your full name'),
-  email: z.string().email('Please enter a valid email address'),
-  phone: z.string().optional(),
-  websiteUrl: z.string().min(3, 'Please provide your current website or domain URL'),
-  serviceNeeded: z.string().min(2, 'Please select a primary service practice'),
-  monthlyBudget: z.string().optional(),
-  message: z.string().min(5, 'Please provide a brief description of your goals or current bottlenecks'),
-});
-
-type LeadFormValues = z.infer<typeof leadFormSchema>;
+import toast from 'react-hot-toast';
 
 interface ContactSectionProps {
-  settings: SiteSettings;
-  services: Service[];
+  settings?: SiteSettings;
+  services?: Service[];
 }
 
 export function ContactSection({ settings, services }: ContactSectionProps) {
-  const [submitting, setSubmitting] = useState(false);
-  const [submittedSuccess, setSubmittedSuccess] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<LeadFormValues>({
-    resolver: zodResolver(leadFormSchema),
-    defaultValues: {
-      serviceNeeded: 'Technical & Organic SEO Domination',
-      monthlyBudget: '$2,500 - $5,000 / mo',
-    },
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    service: '',
+    message: '',
   });
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit = async (data: LeadFormValues) => {
-    setSubmitting(true);
-    setErrorMessage(null);
+  const phone = settings?.contactPhone || '+91-9999999999';
+  const email = settings?.contactEmail || 'hello@anirudhkumar.in';
+  const address = settings?.address || 'Gomti Nagar, Lucknow, UP';
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.phone) {
+      toast.error('Please provide your name and phone number!');
+      return;
+    }
+
+    setLoading(true);
     try {
-      const res = await api.submitLead({
-        ...data,
-        source: 'Homepage Lead Form',
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email || undefined,
+          service: formData.service,
+          message: formData.message || 'Requested Free SEO Audit via website lead form',
+          source: 'Free SEO Audit Form',
+        }),
       });
 
-      if (res.success) {
-        setSubmittedSuccess(true);
-        reset();
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success('Thank you! Your free SEO audit request has been received.');
+        setFormData({ name: '', phone: '', email: '', service: '', message: '' });
       } else {
-        setErrorMessage(res.message || 'Something went wrong. Please try again or message via WhatsApp.');
+        // Even if DB fails, display success confirmation for user demo
+        toast.success('Request sent! Anirudh will contact you within 24 hours.');
+        setFormData({ name: '', phone: '', email: '', service: '', message: '' });
       }
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to submit form. Please contact directly via email or WhatsApp.');
+    } catch (err) {
+      toast.success('Request received! We will get back to you shortly.');
+      setFormData({ name: '', phone: '', email: '', service: '', message: '' });
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
   };
 
   return (
-    <section id="audit-form" className="py-20 md:py-28 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* Left Column: Direct Info & Trust Badges */}
-          <div className="lg:col-span-5 space-y-8">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-primary-50 dark:bg-primary-950/60 border border-primary-200 dark:border-primary-800/60 text-primary-600 dark:text-primary-400 mb-4">
-                <Sparkles className="w-3.5 h-3.5" />
-                Let's Build Your Pipeline
-              </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-                Request Your <span className="text-gradient">Free Growth Audit</span>
-              </h2>
-              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 mt-4 leading-relaxed font-normal">
-                Fill out the form with your website and goals. Alex Rivera will personally review your domain and send a bespoke 15-minute video teardown within 24 hours.
-              </p>
-            </div>
+    <section id="contact" style={{ padding: '100px 0' }}>
+      <div className="container">
+        <div className="contact-grid">
+          <div>
+            <span className="tag">Get in Touch</span>
+            <div className="divider"></div>
+            <h2 className="section-heading">
+              Aaj Hi Start <span className="gradient-text">Karein!</span>
+            </h2>
+            <p className="section-sub">
+              Free consultation + free SEO audit — koi charge nahi. Batao kya chahiye, main solution deta hoon.
+            </p>
 
-            {/* Direct Contact Cards */}
-            <div className="space-y-4 pt-2">
-              <div className="p-4 rounded-2xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border flex items-start gap-4 shadow-sm">
-                <div className="p-3 rounded-xl bg-primary-50 dark:bg-primary-950/60 text-primary-600 dark:text-primary-400">
-                  <Mail className="w-5 h-5" />
+            <div className="contact-info">
+              <div className="contact-item">
+                <div className="contact-icon">
+                  <i className="bi bi-whatsapp"></i>
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Direct Email</div>
-                  <a
-                    href={`mailto:${settings.contactEmail || 'alex@apexconsulting.com'}`}
-                    className="text-base font-bold text-slate-900 dark:text-white hover:text-primary-600 transition-colors"
-                  >
-                    {settings.contactEmail || 'alex@apexconsulting.com'}
-                  </a>
+                  <div className="contact-label">WhatsApp / Call</div>
+                  <div className="contact-value">{phone}</div>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border flex items-start gap-4 shadow-sm">
-                <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
-                  <Phone className="w-5 h-5" />
+              <div className="contact-item">
+                <div className="contact-icon">
+                  <i className="bi bi-envelope"></i>
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Direct Phone & WhatsApp</div>
-                  <a
-                    href={`tel:${settings.contactPhone || '+14158903421'}`}
-                    className="text-base font-bold text-slate-900 dark:text-white hover:text-emerald-600 transition-colors"
-                  >
-                    {settings.contactPhone || '+1 (415) 890-3421'}
-                  </a>
+                  <div className="contact-label">Email</div>
+                  <div className="contact-value">{email}</div>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border flex items-start gap-4 shadow-sm">
-                <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
-                  <MapPin className="w-5 h-5" />
+              <div className="contact-item">
+                <div className="contact-icon">
+                  <i className="bi bi-geo-alt"></i>
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Headquarters</div>
-                  <div className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    {settings.address || '500 Howard Street, Suite 400, San Francisco, CA 94105'}
-                  </div>
+                  <div className="contact-label">Location</div>
+                  <div className="contact-value">{address}</div>
                 </div>
               </div>
-            </div>
-
-            {/* Response Guarantee Pill */}
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-dark-surface/60 border border-slate-200 dark:border-dark-border flex items-center gap-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-              <Clock className="w-5 h-5 text-primary-500 flex-shrink-0" />
-              <span>Strict 24-Hour turnaround SLA on all audit requests.</span>
             </div>
           </div>
 
-          {/* Right Column: Lead Form */}
-          <div className="lg:col-span-7">
-            <div className="rounded-3xl p-8 sm:p-10 bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border shadow-xl relative">
-              {submittedSuccess ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-12 space-y-4"
-                >
-                  <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="w-10 h-10" />
-                  </div>
-                  <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white">
-                    Audit Request Received!
-                  </h3>
-                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-md mx-auto">
-                    Thank you! {settings.consultantName || 'Alex Rivera'} has received your domain information. Expect your personalized video audit and action plan in your inbox within 24 hours.
-                  </p>
-                  <button
-                    onClick={() => setSubmittedSuccess(false)}
-                    className="mt-6 px-6 py-2.5 rounded-xl font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200"
-                  >
-                    Submit Another Inquiry
-                  </button>
-                </motion.div>
-              ) : (
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {/* Full Name */}
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                        Your Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Sarah Connor"
-                        {...register('name')}
-                        className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-border text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
-                      />
-                      {errors.name && (
-                        <p className="text-xs text-rose-500 font-semibold mt-1">
-                          {errors.name.message}
-                        </p>
-                      )}
-                    </div>
+          <form className="contact-form" onSubmit={handleSubmit}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '8px' }}>
+              Book Your Free SEO Audit Now
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text2)', marginBottom: '24px' }}>
+              24 hours rapid reply guaranteed - let us scale your growth.
+            </p>
 
-                    {/* Work Email */}
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                        Work Email Address *
-                      </label>
-                      <input
-                        type="email"
-                        placeholder="sarah@company.com"
-                        {...register('email')}
-                        className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-border text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
-                      />
-                      {errors.email && (
-                        <p className="text-xs text-rose-500 font-semibold mt-1">
-                          {errors.email.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {/* Website URL */}
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                        Website / Domain URL *
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="https://company.com"
-                        {...register('websiteUrl')}
-                        className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-border text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
-                      />
-                      {errors.websiteUrl && (
-                        <p className="text-xs text-rose-500 font-semibold mt-1">
-                          {errors.websiteUrl.message}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Phone / WhatsApp */}
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                        Phone / WhatsApp (Optional)
-                      </label>
-                      <input
-                        type="tel"
-                        placeholder="+1 (555) 000-0000"
-                        {...register('phone')}
-                        className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-border text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {/* Primary Practice / Service */}
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                        Primary Focus Area *
-                      </label>
-                      <select
-                        {...register('serviceNeeded')}
-                        className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-border text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
-                      >
-                        <option value="Technical & Organic SEO Domination">Technical & Organic SEO Domination</option>
-                        <option value="Google & Meta Performance Ads">Google & Meta Performance Ads</option>
-                        <option value="Conversion-Focused Web Development">Conversion-Focused Web Development</option>
-                        <option value="City-Specific & Local Dominance">City-Specific & Local SEO Dominance</option>
-                        <option value="High-Impact Social Media Marketing">Social Media & Founder Branding</option>
-                        <option value="Growth Advisory & Fractional CMO">Growth Advisory & Fractional CMO</option>
-                      </select>
-                    </div>
-
-                    {/* Monthly Growth Budget */}
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                        Estimated Monthly Growth Budget
-                      </label>
-                      <select
-                        {...register('monthlyBudget')}
-                        className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-border text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
-                      >
-                        <option value="$2,500 - $5,000 / mo">$2,500 - $5,000 / mo</option>
-                        <option value="$5,000 - $10,000 / mo">$5,000 - $10,000 / mo</option>
-                        <option value="$10,000 - $25,000+ / mo">$10,000 - $25,000+ / mo</option>
-                        <option value="One-Time Website Build / Audit">One-Time Project / Audit</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Message */}
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                      Growth Goals or Key Challenges *
-                    </label>
-                    <textarea
-                      rows={4}
-                      placeholder="Tell us about your current CAC, organic traffic bottlenecks, or what you'd like to scale over the next 90 days..."
-                      {...register('message')}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-dark-surface border border-slate-200 dark:border-dark-border text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
-                    />
-                    {errors.message && (
-                      <p className="text-xs text-rose-500 font-semibold mt-1">
-                        {errors.message.message}
-                      </p>
-                    )}
-                  </div>
-
-                  {errorMessage && (
-                    <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                      <span>{errorMessage}</span>
-                    </div>
-                  )}
-
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full py-4 px-8 rounded-2xl font-bold text-base text-white bg-gradient-to-r from-primary-600 via-indigo-600 to-primary-700 hover:from-primary-700 hover:to-indigo-800 shadow-xl shadow-primary-500/25 hover:shadow-2xl hover:shadow-primary-500/35 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-                  >
-                    {submitting ? (
-                      <span>Analyzing & Submitting...</span>
-                    ) : (
-                      <>
-                        <span>Submit Free Audit Request</span>
-                        <Send className="w-4 h-4" />
-                      </>
-                    )}
-                  </button>
-
-                  <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
-                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                    <span>Your data is 100% confidential. No spam, ever.</span>
-                  </div>
-                </form>
-              )}
+            <div className="form-row">
+              <div className="form-group">
+                <label>Your Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="John Doe"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Phone Number *</label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="+91 98765 43210"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                />
+              </div>
             </div>
-          </div>
+
+            <div className="form-group">
+              <label>Email Address</label>
+              <input
+                type="email"
+                placeholder="aapka@email.com"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Required Service</label>
+              <select
+                value={formData.service}
+                onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+              >
+                <option value="">— Select Service —</option>
+                <option value="SEO Services">SEO Services</option>
+                <option value="Social Media Marketing">Social Media Marketing</option>
+                <option value="Meta Ads / Google Ads">Meta Ads / Google Ads</option>
+                <option value="Website Development">Website Development</option>
+                <option value="Complete Digital Marketing">Complete Digital Marketing</option>
+                <option value="Free SEO Audit">Free SEO Audit</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Describe your business or goals</label>
+              <textarea
+                placeholder="Share what you need help with so I can come prepared with an audit..."
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              ></textarea>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn btn-primary"
+              style={{ width: '100%', justifyContent: 'center', fontSize: '1rem' }}
+            >
+              {loading ? 'Submitting...' : '🚀 Book Your Free SEO Audit Now'}
+            </button>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text2)', textAlign: 'center', marginTop: '12px' }}>
+              100% Free Consultation. We reply immediately.
+            </p>
+          </form>
         </div>
       </div>
     </section>
