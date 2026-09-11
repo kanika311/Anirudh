@@ -322,21 +322,24 @@
       font-family: var(--ff-d);
       font-size: 1.8rem;
       letter-spacing: 0.05em;
-      color: #06060F;
+      color: var(--text) !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 32px
+      gap: 32px;
     }
 
     .nav-links a {
       font-size: 0.875rem;
       font-weight: 600;
-      color: #06060F;
+      color: var(--text) !important;
       transition: color var(--transition);
-      position: relative
+      position: relative;
     }
 
     .nav-links a::after {
@@ -349,15 +352,15 @@
       background: var(--accent);
       border-radius: 1px;
       transform: scaleX(0);
-      transition: transform var(--transition)
+      transition: transform var(--transition);
     }
 
     .nav-links a:hover {
-      color: var(--text)
+      color: var(--accent) !important;
     }
 
     .nav-links a:hover::after {
-      transform: scaleX(1)
+      transform: scaleX(1);
     }
 
     /* DROPDOWN STYLES */
@@ -372,8 +375,10 @@
       top: calc(100% - 10px);
       left: 50%;
       transform: translateX(-50%) translateY(20px);
-      background: rgb(245, 243, 252);
-      border: 1px solid var(--border2);
+      background: var(--card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
       border-radius: 12px;
       min-width: 220px;
       padding: 15px;
@@ -384,7 +389,8 @@
       z-index: 1001;
     }
 
-    .nav-item-dropdown:hover .dropdown-menu {
+    .nav-item-dropdown:hover .dropdown-menu,
+    .dropdown-menu.show {
       opacity: 1;
       visibility: visible;
       transform: translateX(-50%) translateY(0);
@@ -393,7 +399,7 @@
     .dropdown-menu a {
       display: block;
       padding: 10px 15px;
-      color: #06060F;
+      color: var(--text2);
       font-size: 0.85rem;
       border-radius: 8px;
       transition: all 0.2s ease;
